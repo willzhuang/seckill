@@ -21,13 +21,13 @@ public class SuccessKilledDaoTest {
     private SuccessKilledDao successKilledDao;
 
     @Test
-    public void insertSuccessKilled() throws Exception {
+    public void testInsertSuccessKilled() throws Exception {
         int insertCount = successKilledDao.insertSuccessKilled(1000L,18642690000L);
         System.out.println("insertCount=" + insertCount);
     }
 
     @Test
-    public void queryByIdWithSeckill() throws Exception {
+    public void testQueryByIdWithSeckill() throws Exception {
         SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(1000L,18642690000L);
         System.out.println(successKilled);
         System.out.println(successKilled.getSeckill());
