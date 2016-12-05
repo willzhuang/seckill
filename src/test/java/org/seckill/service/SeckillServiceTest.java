@@ -3,7 +3,7 @@ package org.seckill.service;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.seckill.dto.Exposer;
-import org.seckill.dto.SeckillExcution;
+import org.seckill.dto.SeckillExecution;
 import org.seckill.entity.Seckill;
 import org.seckill.exception.DuplicatedKillException;
 import org.seckill.exception.SeckillClosedException;
@@ -62,10 +62,12 @@ public class SeckillServiceTest {
             long phoneNumber = 13509871234L;
             String md5 = exposer.getMd5();
             try {
-                SeckillExcution seckillExcution = seckillService.executeSeckill(id,phoneNumber,md5);
-                logger.info("result={}",seckillExcution);
-            } catch (DuplicatedKillException | SeckillClosedException e) {
-                logger.error(e.getMessage());
+                SeckillExecution seckillExecution = seckillService.executeSeckill(id,phoneNumber,md5);
+                logger.info("result={}",seckillExecution);
+            } catch (DuplicatedKillException e1) {
+                logger.error(e1.getMessage());
+            } catch (SeckillClosedException e2) {
+                logger.error(e2.getMessage());
             }
         } else {
             // 秒杀未开启

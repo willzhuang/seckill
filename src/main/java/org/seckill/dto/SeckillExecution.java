@@ -14,7 +14,7 @@ import org.seckill.enums.SeckillStateEnum;
  * @version : SeckillExcution.java, v 0.1 2016-10-19 17:03 will Exp $$
  */
 
-public class SeckillExcution {
+public class SeckillExecution {
 
     private long seckillId;
     // 秒杀执行结果状态
@@ -25,7 +25,7 @@ public class SeckillExcution {
     private SuccessKilled successKilled;
 
     // 秒杀成功，构建返回
-    public SeckillExcution(long seckillId, SeckillStateEnum stateEnum, SuccessKilled successKilled) {
+    public SeckillExecution(long seckillId, SeckillStateEnum stateEnum, SuccessKilled successKilled) {
         this.seckillId = seckillId;
         this.state = stateEnum.getState();
         this.stateInfo = stateEnum.getStateInfo();
@@ -33,7 +33,7 @@ public class SeckillExcution {
     }
 
     // 秒杀失败，构建返回
-    public SeckillExcution(long seckillId, int state, String stateInfo) {
+    public SeckillExecution(long seckillId, SeckillStateEnum stateEnum) {
         this.seckillId = seckillId;
         this.state = state;
         this.stateInfo = stateInfo;

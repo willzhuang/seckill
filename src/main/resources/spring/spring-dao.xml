@@ -1,75 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- config to integrate Mybatis -->
+	<!-- config to integrate Mybatis -->
 
-    <!-- 1:config Database related properties: ${url}  引入jdbc配置文件 -->
-    <context:property-placeholder location="classpath:jdbc.properties"/>
-    <!--<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location" value="classpath:jdbc.properties"/>
-        <property name="fileEncoding" value="utf-8"/>
-    </bean-->
+	<!-- 1:config Database related properties: ${url} 引入jdbc配置文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties" />
+	<!--<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
+		<property name="location" value="classpath:jdbc.properties"/> <property name="fileEncoding" 
+		value="utf-8"/> </bean -->
 
-    <!-- 2:database connect pool -->
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-        <!-- db connext pool setting -->
-        <property name="driverClass" value="${driver}"/>
-        <property name="jdbcUrl" value="${url}"/>
-        <property name="user" value="${username}"/>
-        <property name="password" value="${password}"/>
+	<!-- 2:database connect pool -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<!-- db connext pool setting -->
+		<property name="driverClass" value="${driver}" />
+		<property name="jdbcUrl" value="${url}" />
+		<property name="user" value="${username}" />
+		<property name="password" value="${password}" />
 
-        <!-- c3p0 connect pool private config -->
-        <property name="maxPoolSize" value="30"/>
-        <property name="minPoolSize" value="10"/>
+		<!-- c3p0 connect pool private config -->
+		<property name="maxPoolSize" value="30" />
+		<property name="minPoolSize" value="10" />
 
-        <!-- do not commit once the connect close -->
-        <property name="autoCommitOnClose" value="false"/>
+		<!-- do not commit once the connect close -->
+		<property name="autoCommitOnClose" value="false" />
 
-        <!-- connectiong time out -->
-        <property name="checkoutTimeout" value="1000"/>
+		<!-- connectiong time out -->
+		<property name="checkoutTimeout" value="1000" />
 
-        <!-- try times when connection failed -->
-        <property name="acquireRetryAttempts" value="2"/>
-    </bean>
-            
-    <!-- 3: SQLSessionFactory -->
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <!-- integer database connect pool with mybatis. value="dataSource" here is created by step 2. -->
-        <!-- 1.ref   指定集合元素师容器中另一个Bean实例.
-                     如果不适用自动装配的情况下，Bean依赖必须通过ref元素定义.
-                     当一个Bean即使用自动装配依赖，又使用ref显示依赖时，则显示指定的依赖就会覆盖自动装配.
-             2.value 指定集合元素是基本数据类型或者String类型值
-             3.list、set、map、props 需要手动配置集合元素
-             <property name="scores">
-21             <map>
-22                 <entry key="语文" value="88" />
-23                 <entry key="数学" value="87" />
-25             </map>
-26           </property>
-        -->
-        <property name="dataSource" ref="dataSource"/>
+		<!-- try times when connection failed -->
+		<property name="acquireRetryAttempts" value="2" />
+	</bean>
 
-        <!-- Mybatis config file: mybatis-config.xml -->
-        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+	<!-- 3: SQLSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- integer database connect pool with mybatis. value="dataSource" here 
+			is created by step 2. -->
+		<!-- 1.ref 指定集合元素师容器中另一个Bean实例. 如果不适用自动装配的情况下，Bean依赖必须通过ref元素定义. 当一个Bean即使用自动装配依赖，又使用ref显示依赖时，则显示指定的依赖就会覆盖自动装配. 
+			2.value 指定集合元素是基本数据类型或者String类型值 3.list、set、map、props 需要手动配置集合元素 <property 
+			name="scores"> 21 <map> 22 <entry key="语文" value="88" /> 23 <entry key="数学" 
+			value="87" /> 25 </map> 26 </property> -->
+		<property name="dataSource" ref="dataSource" />
 
-        <!-- scan entity package: org.seckill.entity.Seckill => Seckill-->
-        <property name="typeAliasesPackage" value="org.seckill.entity"/>
-        <!-- scan sql setting files: mapper (xml) files -->
-        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
-    </bean>
+		<!-- Mybatis config file: mybatis-config.xml -->
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
 
-    <!-- config the scan Dao package, Impl the Dao dynamicly, inject spring container -->
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <!-- inject sqlSessionFactoryBeanName -->
-        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
-        <!-- list the scanning Dao package -->
-        <property name="basePackage" value="org.seckill.dao"/>
-    </bean>
+		<!-- scan entity package: org.seckill.entity.Seckill => Seckill -->
+		<property name="typeAliasesPackage" value="org.seckill.entity" />
+		<!-- scan sql setting files: mapper (xml) files -->
+		<property name="mapperLocations" value="classpath:mapper/*.xml" />
+	</bean>
+
+	<!-- config the scan Dao package, Impl the Dao dynamicly, inject spring 
+		container -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- inject sqlSessionFactoryBeanName -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+		<!-- list the scanning Dao package -->
+		<property name="basePackage" value="org.seckill.dao" />
+	</bean>
 
 </beans>
