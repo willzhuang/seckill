@@ -79,7 +79,7 @@ public class SeckillController {
     @RequestMapping(value = "/{seckillId}/{md5}/execution",
             method = RequestMethod.POST,
             produces = {"application/json;charset=UTF-8"})
-    @ResponseBody
+    @ResponseBody //把返回结果自动封装为json
     public SeckillResult<SeckillExecution> excute(@PathVariable("seckillId") Long seckillId,
                                                   @PathVariable("md5") String md5,
                                                   @CookieValue(value = "killPhone", required = false) Long phoneNumber) {
@@ -93,20 +93,21 @@ public class SeckillController {
         } catch (DuplicatedKillException e) {
             SeckillExecution execution = new SeckillExecution(seckillId,
                     SeckillStateEnum.DUPLICATED_KILL);
-            return new SeckillResult<SeckillExecution>(false, execution);
+            return new SeckillResult<SeckillExecution>(true, execution);
         } catch (SeckillClosedException e) {
             SeckillExecution execution = new SeckillExecution(seckillId,
                     SeckillStateEnum.END);
-            return new SeckillResult<SeckillExecution>(false, execution);
+            return new SeckillResult<SeckillExecution>(true, execution);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             SeckillExecution execution = new SeckillExecution(seckillId,
                     SeckillStateEnum.INNER_ERROR);
-            return new SeckillResult<SeckillExecution>(false, execution);
+            return new SeckillResult<SeckillExecution>(true, execution);
         }
     }
 
     @RequestMapping(value = "/time/now", method = RequestMethod.GET)
+    @ResponseBody //把返回结果自动封装为json
     public SeckillResult<Long> getTime() {
         Date now = new Date();
         return new SeckillResult<Long>(true, now.getTime());
