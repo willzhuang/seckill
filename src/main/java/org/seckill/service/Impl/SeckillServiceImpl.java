@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.seckill.dao.SeckillDao;
 import org.seckill.dao.SuccessKilledDao;
+import org.seckill.dao.cache.RedisDao;
 import org.seckill.dto.Exposer;
 import org.seckill.dto.SeckillExecution;
 import org.seckill.entity.Seckill;
@@ -29,6 +30,7 @@ import org.springframework.util.DigestUtils;
  * @author will
  * @version : SeckillServiceImpl.java, v 0.1 2016-10-19 17:03 will Exp $$
  */
+//@Component @Service @Dao @Conroller
 @Service
 public class SeckillServiceImpl implements SeckillService {
 
@@ -41,6 +43,9 @@ public class SeckillServiceImpl implements SeckillService {
 
     @Autowired
     private SuccessKilledDao successKilledDao;
+
+    @Autowired
+    private RedisDao redisDao;
 
     // md5 的盐值，起到混淆加密的作用
     private final static String salt = "zaq12wsxcde3$%^MLP)(" ;
@@ -57,9 +62,18 @@ public class SeckillServiceImpl implements SeckillService {
 
     @Override
     public Exposer exportSeckillUrl(long seckillId) {
-        Seckill seckill = seckillDao.queryById(seckillId);
+        // 优化点：缓存优化。一致性建立在超时的基础之上。
+        // 1. 访问 redis
+        Seckill seckill = redisDao.getSeckill(seckillId);
         if (seckill == null) {
-            return new Exposer(false,seckillId);
+            // 2. 访问数据库
+            seckill = seckillDao.queryById(seckillId);
+            if (seckill == null) {
+                return new Exposer(false,seckillId);
+            } else {
+                // 3. 放入 redis
+                redisDao.putSeckill(seckill);
+            }
         }
         Date startTime = seckill.getStartTime();
         Date endTime = seckill.getEndTime();
