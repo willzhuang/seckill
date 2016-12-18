@@ -16,8 +16,8 @@ import java.util.List;
 /**
  * @author will
  * @version : SeckillService.java, v 0.1 2016-10-19 17:03 will Exp $$
- * 业务接口：站在使用者的角度设计接口
- *  1. 方法定力的粒度；2. 参数；3. 返回类型(return 的类型/异常)
+ *          业务接口：站在使用者的角度设计接口
+ *          1. 方法定力的粒度；2. 参数；3. 返回类型(return 的类型/异常)
  */
 
 public interface SeckillService {
@@ -32,8 +32,11 @@ public interface SeckillService {
     // 否则输出系统时间和秒杀时间
     Exposer exportSeckillUrl(long seckillId);
 
-    // excute second kill buy
+    // excute second kill buy，使用spring事物的秒杀过程
     SeckillExecution executeSeckill(long seckillId, long userPhone, String md5)
-            throws SeckillException,DuplicatedKillException,SeckillClosedException;
+            throws SeckillException, DuplicatedKillException, SeckillClosedException;
+
+    // 使用存储过程的秒杀过程
+    SeckillExecution executeSeckillProcedure(long seckillId, long userPhone, String md5);
 
 }

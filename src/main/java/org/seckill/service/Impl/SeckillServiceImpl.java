@@ -5,8 +5,11 @@
 package org.seckill.service.Impl;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections.MapUtils;
 import org.seckill.dao.SeckillDao;
 import org.seckill.dao.SuccessKilledDao;
 import org.seckill.dao.cache.RedisDao;
@@ -48,11 +51,11 @@ public class SeckillServiceImpl implements SeckillService {
     private RedisDao redisDao;
 
     // md5 的盐值，起到混淆加密的作用
-    private final static String salt = "zaq12wsxcde3$%^MLP)(" ;
+    private final static String salt = "zaq12wsxcde3$%^MLP)(";
 
     @Override
     public List<Seckill> getSeckillList() {
-        return seckillDao.queryAll(0,12);
+        return seckillDao.queryAll(0, 12);
     }
 
     @Override
@@ -69,7 +72,7 @@ public class SeckillServiceImpl implements SeckillService {
             // 2. 访问数据库
             seckill = seckillDao.queryById(seckillId);
             if (seckill == null) {
-                return new Exposer(false,seckillId);
+                return new Exposer(false, seckillId);
             } else {
                 // 3. 放入 redis
                 redisDao.putSeckill(seckill);
@@ -103,18 +106,20 @@ public class SeckillServiceImpl implements SeckillService {
         if (md5 == null || !md5.equals(getMd5(seckillId))) {
             throw new SeckillException("秒杀数据被篡改");
         }
-        //执行秒杀逻辑：1.减库存；2.记录购买行为
+        // 执行秒杀逻辑：1.记录购买行; 2.减库存(raw lock);
+        // 这样降低了事物中 raw lock -> commit 的持续时间。
         Date nowTime = new Date();
         try {
-            int updateCount = seckillDao.reduceNumber(seckillId, nowTime);
-            if (updateCount <= 0) {
-                // 没有更新到记录，秒杀结束
-                throw new SeckillClosedException("秒杀结束！");
+            // 记录购买行为
+            int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone);
+            if (insertCount <= 0) {
+                throw new DuplicatedKillException("重复的秒杀！");
             } else {
-                // 记录购买行为
-                int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone);
-                if (insertCount <= 0) {
-                    throw new DuplicatedKillException("重复的秒杀！");
+                // 减库存，热点商品竞争
+                int updateCount = seckillDao.reduceNumber(seckillId, nowTime);
+                if (updateCount <= 0) {
+                    // 没有更新到记录，秒杀结束
+                    throw new SeckillClosedException("秒杀结束！");
                 } else {
                     //秒杀成功
                     SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
@@ -126,9 +131,36 @@ public class SeckillServiceImpl implements SeckillService {
         } catch (SeckillClosedException e2) {
             throw e2;
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             // 编译器异常转化为运行期异常
             throw new SeckillException("seckill inner error:" + e.getMessage());
+        }
+    }
+
+    @Override
+    public SeckillExecution executeSeckillProcedure(long seckillId, long userPhone, String md5) {
+        if (md5 == null || !md5.equals(getMd5(seckillId))) {
+            return new SeckillExecution(seckillId, SeckillStateEnum.DATA_REWRITE);
+        }
+        Date killTime = new Date();
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("seckillId", seckillId);
+        map.put("phone", userPhone);
+        map.put("killTime", killTime);
+        map.put("result", null);
+        // 执行存储过程，result 被赋值
+        try {
+            seckillDao.killByProcedure(map);
+            int result = MapUtils.getInteger(map, "result", -2);
+            if (result == 1) {
+                SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
+                return new SeckillExecution(seckillId, SeckillStateEnum.SUCCESS, successKilled);
+            } else {
+                return new SeckillExecution(seckillId, SeckillStateEnum.stateof(result));
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return new SeckillExecution(seckillId, SeckillStateEnum.INNER_ERROR);
         }
     }
 

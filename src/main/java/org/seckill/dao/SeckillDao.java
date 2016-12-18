@@ -9,6 +9,7 @@ import org.seckill.entity.Seckill;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author will
@@ -36,6 +37,11 @@ public interface SeckillDao {
     * 因为java没有保存形参的记录:queryAll(int offet,int limit) ->queryAll(arg0,arg1). SQL拿不到offset 和 limit.
     * */
     List<Seckill> queryAll(@Param("offset") int offset, @Param("limit") int limit);
+
+    /*
+    * 使用存储过程执行秒杀
+    * */
+    void killByProcedure(Map<String, Object> paraMap);
 
 
 }
