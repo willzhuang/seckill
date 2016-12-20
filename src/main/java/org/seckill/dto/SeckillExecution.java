@@ -8,8 +8,8 @@ import org.seckill.entity.SuccessKilled;
 import org.seckill.enums.SeckillStateEnum;
 
 /**
- *
  * 封装秒杀执行后的结果
+ *
  * @author will
  * @version : SeckillExcution.java, v 0.1 2016-10-19 17:03 will Exp $$
  */

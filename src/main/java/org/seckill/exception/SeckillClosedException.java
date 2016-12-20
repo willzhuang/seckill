@@ -6,6 +6,7 @@ package org.seckill.exception;
 
 /**
  * 秒杀已经关闭异常
+ *
  * @author will
  * @version : SeckillClosedException.java, v 0.1 2016-10-19 17:03 will Exp $$
  */

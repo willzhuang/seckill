@@ -20,13 +20,13 @@ public class RedisDao {
 
     private RuntimeSchema<Seckill> schema = RuntimeSchema.createFrom(Seckill.class);
 
-    public RedisDao(String ip, int port){
+    public RedisDao(String ip, int port) {
         jedisPool = new JedisPool(ip, port);
     }
 
     public Seckill getSeckill(long seckillId) {
         // redis 操作逻辑
-        try{
+        try {
             Jedis jedis = jedisPool.getResource();
             try {
                 String key = "seckill:" + seckillId;
@@ -46,7 +46,7 @@ public class RedisDao {
                 jedis.close();
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return null;
     }
@@ -61,7 +61,7 @@ public class RedisDao {
                         schema,
                         LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE));
                 int timeout = 60 * 60;  // 缓存超时时间，1小时
-                String result = jedis.setex(key.getBytes(),timeout,bytes);
+                String result = jedis.setex(key.getBytes(), timeout, bytes);
                 return result; // Status code reply, "OK"
             } finally {
                 jedis.close();

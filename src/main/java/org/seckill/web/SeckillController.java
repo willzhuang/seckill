@@ -37,16 +37,16 @@ public class SeckillController {
     private SeckillService seckillService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public String list(Model model){
+    public String list(Model model) {
         //获取列表页面
         List<Seckill> list = seckillService.getSeckillList();
-        model.addAttribute("list",list);
+        model.addAttribute("list", list);
         //list.jsp +  model = ModelAndView
         return "list";  // /WEB-INF/jsp/"list".jsp
     }
 
-    @RequestMapping(value = "/{seckillId}/detail",method = RequestMethod.GET)
-    public String detail(@PathVariable("seckillId") Long seckillId, Model model){
+    @RequestMapping(value = "/{seckillId}/detail", method = RequestMethod.GET)
+    public String detail(@PathVariable("seckillId") Long seckillId, Model model) {
         if (seckillId == null) {
             return "redirect:/seckill/list";
         }
@@ -54,7 +54,7 @@ public class SeckillController {
         if (seckill == null) {
             return "forward:/seckill/list";
         }
-        model.addAttribute("seckill",seckill);
+        model.addAttribute("seckill", seckill);
         return "detail";    // /WEB-INF/jsp/"detail".jsp
     }
 
@@ -63,13 +63,13 @@ public class SeckillController {
             method = RequestMethod.POST,
             produces = {"application/json;charset=UTF-8"})
     @ResponseBody //把返回结果自动封装为json
-    public SeckillResult<Exposer> exposer(@PathVariable("seckillId") Long seckillId){
+    public SeckillResult<Exposer> exposer(@PathVariable("seckillId") Long seckillId) {
         SeckillResult<Exposer> result;
         try {
             Exposer exposer = seckillService.exportSeckillUrl(seckillId);
-            result = new SeckillResult<Exposer>(true,exposer);
+            result = new SeckillResult<Exposer>(true, exposer);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             result = new SeckillResult<Exposer>(false, e.getMessage());
         }
         return result;
@@ -84,7 +84,7 @@ public class SeckillController {
                                                   @PathVariable("md5") String md5,
                                                   @CookieValue(value = "killPhone", required = false) Long phoneNumber) {
         if (phoneNumber == null) {
-            return new SeckillResult<SeckillExecution>(false,"未注册!");
+            return new SeckillResult<SeckillExecution>(false, "未注册!");
         }
         SeckillResult<SeckillExecution> result;
         try {

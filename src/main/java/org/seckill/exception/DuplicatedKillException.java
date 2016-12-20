@@ -6,6 +6,7 @@ package org.seckill.exception;
 
 /**
  * 重复秒杀异常
+ *
  * @author will
  * @version : DuplicatedKillException.java, v 0.1 2016-10-19 17:03 will Exp $$
  */
