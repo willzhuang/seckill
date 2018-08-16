@@ -17,9 +17,9 @@
 8. 前端,CDN,缓存理解
 
 ## 课程视频
-名称              | 地址
-------------      | ------------- 
-业务分析与DAO实现  | http://www.imooc.com/learn/587
-Service层实现     | http://www.imooc.com/learn/631
-WEB层实现         | http://www.imooc.com/learn/630
-并发优化          | http://www.imooc.com/learn/632
+名称           
+------------     
+业务分析与DAO实现  
+Service层实现     
+WEB层实现        
+并发优化         
